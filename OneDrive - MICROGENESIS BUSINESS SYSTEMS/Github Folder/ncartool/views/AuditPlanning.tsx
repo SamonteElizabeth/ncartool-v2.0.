@@ -14,7 +14,6 @@ import {
   FileIcon, 
   Check, 
   ChevronDown,
-  ArrowRightCircle,
   Search,
   Filter,
   CalendarDays
@@ -62,7 +61,7 @@ const MultiSelectDropdown = ({
 
   return (
     <div className="relative" ref={containerRef}>
-      <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">{label}</label>
+      <label className="text-sm font-black text-gray-400 uppercase tracking-widest block mb-2">{label}</label>
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-gray-50 border-gray-200 border-2 rounded-xl p-3 flex items-center justify-between cursor-pointer focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all min-h-[48px]"
@@ -126,6 +125,16 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
   
   const ALL_AUDITORS = INITIAL_USERS.filter((u: any) => u.role === 'AUDITOR' || u.role === 'LEAD_AUDITOR').map((u: any) => u.name);
   const ALL_AUDITEES = INITIAL_USERS.filter((u: any) => u.role === 'AUDITEE').map((u: any) => u.name);
+  const PROCESS_OPTIONS = [
+    'Access Control',
+    'Incident Management',
+    'Change Management',
+    'Vendor Management',
+    'Data Privacy',
+    'Financial Reporting',
+    'Procurement',
+    'IT Operations'
+  ];
 
   const getNextStatus = (current: AuditStatus): AuditStatus | null => {
     switch (current) {
@@ -170,8 +179,8 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
     }
   };
 
-  const handleSavePlan = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSavePlan = (e?: React.FormEvent | null, finalize = false) => {
+    if (e && 'preventDefault' in e) e.preventDefault();
     if (formData.auditors.length === 0 || formData.auditees.length === 0) {
       onNotify('Please select at least one auditor and one auditee.', 'warning');
       return;
@@ -186,7 +195,8 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
         auditees: formData.auditees,
         attachmentName: formData.attachmentName,
         auditType: formData.auditType,
-        processName: formData.processName
+        processName: formData.processName,
+        status: finalize ? p.status : AuditStatus.DRAFT
       } : p));
       onNotify('Audit Plan updated successfully.', 'success');
     } else {
@@ -199,14 +209,14 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
         auditors: formData.auditors,
         auditees: formData.auditees,
         attachmentName: formData.attachmentName || 'No attachment',
-        status: AuditStatus.DRAFT,
+        status: finalize ? AuditStatus.PLANNED : AuditStatus.DRAFT,
         isLocked: false,
         createdAt: now.toISOString(),
         auditType: formData.auditType,
         processName: formData.processName
       };
       setPlans(prev => [newPlan, ...prev]);
-      onNotify('New Audit Plan drafted.', 'success');
+      onNotify(finalize ? 'New Audit Plan created.' : 'New Audit Plan drafted.', 'success');
     }
     closeModal();
   };
@@ -253,25 +263,25 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-3xl font-black text-gray-900 tracking-tight">Audit Plan</h3>
+          <h3 className="text-2xl font-black text-gray-900 tracking-tight">Audit Plan</h3>
         </div>
         
         {isLead && (
           <button 
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-3 bg-[#3b82f6] hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black transition-all shadow-xl shadow-blue-200 text-base"
+            className="flex items-center gap-2 bg-[#3b82f6] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-black text-sm transition-all shadow-xl shadow-blue-200"
           >
-            <Plus size={24} />
+            <Plus size={20} />
             Create Plan
           </button>
         )}
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6">
+      <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input 
@@ -279,10 +289,10 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
             placeholder="Search plans by ID or User..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-base font-medium"
+            className="w-full pl-12 pr-6 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-medium"
           />
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative w-full sm:w-auto">
             <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
             <input 
@@ -290,13 +300,13 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
               title="Filter by active date"
-              className="w-full sm:w-48 pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-base font-black text-gray-600 outline-none cursor-pointer"
+              className="w-full sm:w-48 pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-black text-gray-600 outline-none cursor-pointer"
             />
           </div>
           <select 
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-48 bg-gray-50 border-none rounded-2xl px-7 py-4 text-base font-black text-gray-600 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-48 bg-gray-50 border-none rounded-xl px-5 py-3 text-sm font-black text-gray-600 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500"
           >
             <option>All Status</option>
             {Object.values(AuditStatus).map(s => <option key={s} value={s}>{s}</option>)}
@@ -313,24 +323,24 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#3b82f6] text-white">
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Plan ID</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest text-center">Docs</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Start Date</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">End Date</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Teams</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Status</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest text-center">Actions</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Plan ID</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest text-center">Docs</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Start Date</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">End Date</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Teams</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Status</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredPlans.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-8 py-20 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center opacity-40">
                       <Search size={48} className="mb-4" />
                       <p className="font-black uppercase tracking-widest">No plans matching criteria</p>
@@ -340,10 +350,10 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
               ) : (
                 filteredPlans.map((plan) => (
                   <tr key={plan.id} className="hover:bg-blue-50/30 transition-colors group">
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <span className="text-[12px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-tighter border border-blue-100">{plan.id}</span>
                     </td>
-                    <td className="px-8 py-6 text-center">
+                    <td className="px-5 py-4 text-center">
                       {plan.attachmentName ? (
                          <div className="flex flex-col items-center gap-1 group/file cursor-pointer" onClick={() => onNotify(`Downloading ${plan.attachmentName}`)}>
                            <FileIcon size={18} className="text-blue-500 group-hover/file:scale-110 transition-transform" />
@@ -353,19 +363,19 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                         <span className="text-[12px] text-gray-300">N/A</span>
                       )}
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5 text-[12px] text-gray-600 font-bold">
                         <Calendar size={16} className="text-gray-400" />
                         {plan.startDate}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5 text-[12px] text-gray-600 font-bold">
                         <Calendar size={16} className="text-gray-400" />
                         {plan.endDate}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-start gap-1.5 text-[12px] text-blue-600 font-black uppercase tracking-tighter">
                           <Users size={14} className="mt-0.5 flex-shrink-0" />
@@ -377,7 +387,7 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <span className={`text-[11px] font-black px-3 py-1 rounded-full uppercase border ${
                         plan.status === AuditStatus.DRAFT ? 'bg-gray-50 text-gray-400 border-gray-200' :
                         plan.status === AuditStatus.PLANNED ? 'bg-blue-50 text-blue-500 border-blue-100' :
@@ -387,26 +397,18 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                         {plan.status}
                       </span>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-2">
                         {isLead && (
                           <>
-                            <button 
+                            <button
                               onClick={() => handleEdit(plan)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all"
+                              className={`p-2 rounded-xl transition-all border text-blue-600 bg-blue-50 border-blue-100 hover:bg-blue-100 hover:text-blue-700`}
                               title="Edit Plan"
                             >
                               <Edit3 size={18} />
                             </button>
-                            {getNextStatus(plan.status) && (
-                              <button 
-                                onClick={() => updateStatus(plan.id)}
-                                className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                title={`Advance to ${getNextStatus(plan.status)}`}
-                              >
-                                <ArrowRightCircle size={18} />
-                              </button>
-                            )}
+                            
                           </>
                         )}
                       </div>
@@ -421,7 +423,7 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6 overflow-y-auto">
-          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <form onSubmit={handleSavePlan}>
               <div className="p-6 flex justify-between items-center border-b border-gray-100">
                 <div className="flex items-center gap-4">
@@ -439,7 +441,7 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
               </div>
               
               <div className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">Audit Type</label>
                     <select 
@@ -456,18 +458,21 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                   </div>
                   <div>
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">Process Name</label>
-                    <input 
+                    <select
                       required
-                      type="text" 
-                      placeholder="e.g. Access Control"
                       value={formData.processName}
                       onChange={(e) => setFormData({...formData, processName: e.target.value})}
-                      className="w-full bg-gray-50 border-gray-200 border-2 rounded-xl p-3 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm" 
-                    />
+                      className="w-full bg-gray-50 border-gray-200 border-2 rounded-xl p-3 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm appearance-none cursor-pointer"
+                    >
+                      <option value="">Select Process</option>
+                      {PROCESS_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">Start Date</label>
                     <input 
@@ -490,7 +495,7 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <MultiSelectDropdown 
                     label="Auditors" 
                     options={ALL_AUDITORS} 
@@ -528,10 +533,10 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
                 </div>
 
                 <div className="flex gap-4 pt-6 border-t border-gray-100">
-                  <button type="button" onClick={closeModal} className="flex-1 px-6 py-3.5 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-500 hover:bg-gray-50 transition-all text-sm uppercase tracking-widest">Discard</button>
-                  <button type="submit" className="flex-[1.5] px-6 py-3.5 bg-[#3b82f6] text-white rounded-2xl font-black hover:bg-blue-600 shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-widest">
+                  <button type="button" onClick={() => handleSavePlan(null, false)} className="flex-1 px-6 py-3.5 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-500 hover:bg-gray-50 transition-all text-sm uppercase tracking-widest">Draft</button>
+                  <button type="button" onClick={(e) => handleSavePlan(null, true)} className="flex-[1.5] px-6 py-3.5 bg-[#3b82f6] text-white rounded-2xl font-black hover:bg-blue-600 shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-widest">
                     <CheckCircle2 size={20} />
-                    {editingId ? 'Save Changes' : 'Create Draft'}
+                    {editingId ? 'Save Changes' : 'Create'}
                   </button>
                 </div>
               </div>
@@ -544,3 +549,4 @@ const AuditPlanning: React.FC<AuditPlanningProps> = ({ plans, setPlans, role, on
 };
 
 export default AuditPlanning;
+

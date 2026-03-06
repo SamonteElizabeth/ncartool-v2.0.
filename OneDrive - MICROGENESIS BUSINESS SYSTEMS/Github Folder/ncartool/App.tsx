@@ -11,16 +11,12 @@ import {
   Menu,
   X,
   Plus,
-  Search,
   ChevronRight,
   Filter,
   ArrowRight,
   TrendingUp,
   Clock,
   Briefcase,
-  Search as SearchIcon,
-  BarChart3,
-  Check,
   FileText,
   UserPlus,
   LogOut
@@ -178,29 +174,21 @@ const App: React.FC = () => {
     }
   };
 
-  // Recreated Logo Component based on the uploaded image
+  // Use exact logo file from public assets.
   const Logo = ({ collapsed }: { collapsed: boolean }) => (
-    <div className={`flex flex-col items-center transition-all duration-300 ${collapsed ? 'gap-0' : 'gap-2'}`}>
-      <div className="relative group">
-        {/* The Outer Glass / Swirl Effect - Adjusted to match the specific blue theme */}
-        <div className={`absolute -inset-2 bg-white/20 rounded-full blur-xl group-hover:bg-white/30 transition-all duration-500 ${collapsed ? 'scale-75' : ''}`}></div>
-        
-        {/* Main Magnifying Glass Icon Recreated with CSS/Lucide */}
-        <div className={`relative bg-white rounded-full flex items-center justify-center border-4 border-blue-400 shadow-lg ${collapsed ? 'w-12 h-12' : 'w-20 h-20'}`}>
-          <div className="relative flex flex-col items-center justify-center">
-            <BarChart3 className={`${collapsed ? 'w-5 h-5' : 'w-8 h-8'} text-blue-300 absolute -translate-y-1`} />
-            <Check className={`${collapsed ? 'w-6 h-6' : 'w-12 h-12'} text-blue-500 absolute translate-y-1 font-black`} strokeWidth={4} />
-          </div>
-          {/* Magnifying Glass Handle */}
-          <div className={`absolute -bottom-1 -right-1 bg-blue-500 rounded-full border-2 border-white transform rotate-45 ${collapsed ? 'w-4 h-6' : 'w-6 h-10'}`}></div>
-        </div>
-      </div>
-      
-      {!collapsed && (
-        <span className="font-black text-2xl text-white tracking-tighter drop-shadow-md">
-          NCAR<span className="text-blue-100">Tool</span>
-        </span>
-      )}
+    <div
+      className={`flex items-center justify-center overflow-hidden mx-auto ${
+        collapsed ? 'w-14 h-14' : 'w-64 h-20'
+      }`}
+    >
+      <img
+        src="/assets/ncar2.png"
+        alt="NCARTool logo"
+        className={`transition-all duration-200 ${
+          collapsed ? 'w-full h-full object-cover scale-[1.25]' : 'w-full h-full object-cover scale-[1.20]'
+        }`}
+        style={{ objectPosition: '50% 50%' }}
+      />
     </div>
   );
 
@@ -211,9 +199,9 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden text-base">
       {/* Sidebar - Updated to specific user blue #3b82f6 */}
-      <aside className={`${isSidebarOpen ? 'w-72' : 'w-24'} bg-[#3b82f6] transition-all duration-300 flex flex-col h-full z-30 shadow-2xl`}>
-        <div className="p-8 pb-6 flex flex-col items-center border-b border-white/10 relative">
-          <div className="w-full flex justify-end lg:flex hidden absolute top-4 right-4">
+      <aside className={`${isSidebarOpen ? 'w-72' : 'w-24'} bg-gradient-to-r from-[#4a87f3] to-[#2eaad1] transition-all duration-300 flex flex-col h-full z-30 shadow-2xl`}>
+        <div className="px-4 pt-5 pb-4 flex flex-col items-center border-b border-white/10 relative">
+          <div className="w-full flex justify-end lg:flex hidden absolute top-3 right-3">
              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-white/10 rounded-md transition-colors">
                <Menu size={20} className="text-blue-50" />
              </button>
@@ -222,7 +210,7 @@ const App: React.FC = () => {
           <Logo collapsed={!isSidebarOpen} />
         </div>
 
-        <nav className="flex-1 p-4 mt-6 space-y-2 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 p-4 mt-3 space-y-2 overflow-y-auto custom-scrollbar">
           {filteredNavItems.map((item) => (
             <button
               key={item.id}
@@ -234,7 +222,7 @@ const App: React.FC = () => {
               } ${!isSidebarOpen && 'justify-center'}`}
             >
               <item.icon size={24} className={activeModule === item.id ? 'text-[#3b82f6]' : 'text-blue-50'} />
-              {isSidebarOpen && <span className="font-bold text-base">{item.label}</span>}
+              {isSidebarOpen && <span className="font-bold text-sm">{item.label}</span>}
             </button>
           ))}
         </nav>
@@ -243,18 +231,9 @@ const App: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Topbar */}
-        <header className="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-end z-20 sticky top-0">
+        <header className="h-15 bg-white border-b border-gray-200 px-6 flex items-center justify-end z-20 sticky top-0">
           
           <div className="flex items-center gap-6">
-            <div className="relative group hidden md:block">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search everything..." 
-                className="pl-12 pr-6 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium w-64 focus:w-80 transition-all focus:ring-2 focus:ring-blue-100 outline-none"
-              />
-            </div>
-
             <div className="relative group">
               <button className="p-2.5 text-gray-400 hover:bg-gray-100 rounded-full transition-colors relative">
                 <Bell size={24} />
@@ -319,7 +298,7 @@ const App: React.FC = () => {
         </header>
 
         {/* Dynamic View */}
-        <section className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-gray-50/50">
+        <section className="flex-1 overflow-y-auto p-5 md:p-6 custom-scrollbar bg-gray-50/50">
           {renderModule()}
         </section>
       </main>

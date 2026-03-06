@@ -63,8 +63,8 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
   const isDevAdmin = role === 'DEV_ADMIN';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+    <div className="space-y-5 animate-in fade-in duration-500">
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-center gap-4 mb-6">
           <div className="p-3 bg-blue-50 rounded-2xl">
             <FileText className="text-blue-600" size={32} />
@@ -82,7 +82,7 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-4 border-dashed rounded-3xl p-12 flex flex-col items-center justify-center transition-all cursor-pointer ${
+                className={`border-4 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center transition-all cursor-pointer ${
                   isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-400 hover:bg-gray-50'
                 }`}
               >
@@ -104,8 +104,8 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
                 </p>
               </div>
             ) : (
-              <div className="bg-blue-50 rounded-3xl p-8 border border-blue-100 flex items-center justify-between">
-                <div className="flex items-center gap-6">
+              <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex items-center justify-between">
+                <div className="flex items-center gap-4">
                   <div className="p-4 bg-white rounded-2xl shadow-sm">
                     <FileText className="text-blue-600" size={40} />
                   </div>
@@ -151,8 +151,8 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
         ) : (
           <div className="space-y-6">
             {userManualFile ? (
-              <div className="bg-white border border-gray-200 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-6">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
                   <div className="p-4 bg-blue-50 rounded-2xl">
                     <FileText className="text-blue-600" size={40} />
                   </div>
@@ -171,7 +171,7 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
                 </a>
               </div>
             ) : (
-              <div className="bg-orange-50 rounded-3xl p-12 border border-orange-100 flex flex-col items-center text-center">
+              <div className="bg-orange-50 rounded-2xl p-12 border border-orange-100 flex flex-col items-center text-center">
                 <div className="p-6 bg-white rounded-full mb-6 shadow-sm">
                   <AlertCircle className="text-orange-500" size={48} />
                 </div>
@@ -183,7 +183,7 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 { title: 'Navigation', desc: 'Learn how to move between modules' },
                 { title: 'NCAR Lifecycle', desc: 'Understand the flow of non-conformities' },
@@ -203,3 +203,4 @@ const UserManualModule: React.FC<UserManualModuleProps> = ({
 };
 
 export default UserManualModule;
+

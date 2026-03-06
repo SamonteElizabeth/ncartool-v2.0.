@@ -68,7 +68,7 @@ export const INITIAL_NCARS: NCAR[] = [
     auditor: 'Alice Smith',
     auditee: 'Charlie Davis',
     createdAt: '2023-09-16T10:00:00Z',
-    status: NCARStatus.OPEN,
+    status: NCARStatus.PENDING,
     deadline: '2023-09-23T10:00:00Z',
     auditType: 'Quality/InfoSec',
     processName: 'Access Control',
@@ -86,7 +86,7 @@ export const INITIAL_NCARS: NCAR[] = [
     auditor: 'John Doe',
     auditee: 'Bob Johnson',
     createdAt: '2023-10-02T14:30:00Z',
-    status: NCARStatus.ACTION_PLAN_SUBMITTED,
+      status: NCARStatus.FOR_APPROVAL,
     deadline: '2023-10-09T14:30:00Z',
     auditType: 'Financial',
     processName: 'Expense Management',
@@ -125,7 +125,8 @@ export const INITIAL_ACTION_PLANS: ActionPlan[] = [
     correctiveAction: 'Implement mandatory attachment validation.',
     dueDate: '2023-11-15',
     submittedAt: '2023-10-04T09:00:00Z',
-    completedAt: '2023-11-10T10:00:00Z'
+    // Action Plan submitted and pending lead auditor approval (no completedAt)
+    remarks: 'expense_receipts_bundle.pdf'
   },
   {
     id: 'ACT_000002_202311',

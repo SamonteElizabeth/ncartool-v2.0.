@@ -50,7 +50,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, setUsers, onNoti
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-5 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">USER MANAGEMENT</h1>
@@ -64,7 +64,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, setUsers, onNoti
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -138,7 +138,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, setUsers, onNoti
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Add New User</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
@@ -233,3 +233,4 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, setUsers, onNoti
 };
 
 export default UserManagement;
+

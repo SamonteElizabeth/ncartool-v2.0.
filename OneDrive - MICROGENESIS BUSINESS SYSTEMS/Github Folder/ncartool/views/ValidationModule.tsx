@@ -110,7 +110,7 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
   const filteredItems = useMemo(() => {
     return ncars.filter(ncar => {
       const isValidatable = 
-        ncar.status === NCARStatus.ACTION_PLAN_SUBMITTED || 
+        ncar.status === NCARStatus.FOR_APPROVAL || 
         ncar.status === NCARStatus.CLOSED || 
         ncar.status === NCARStatus.REOPENED ||
         ncar.status === NCARStatus.REJECTED;
@@ -126,7 +126,7 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
       if (statusFilter === 'All') {
         matchesStatus = true;
       } else if (statusFilter === 'Pending') {
-        matchesStatus = ncar.status === NCARStatus.ACTION_PLAN_SUBMITTED;
+        matchesStatus = ncar.status === NCARStatus.FOR_APPROVAL;
       } else if (statusFilter === 'Approved') {
         matchesStatus = ncar.status === NCARStatus.CLOSED || ncar.status === NCARStatus.VALIDATED;
       } else if (statusFilter === 'Rejected') {
@@ -176,7 +176,7 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
     };
 
     setActionPlans(prev => [...prev.filter(ap => ap.ncarId !== viewingNCARId), newAP]);
-    setNcars(prev => prev.map(n => n.id === viewingNCARId ? { ...n, status: NCARStatus.ACTION_PLAN_SUBMITTED, rejectionRemarks: undefined } : n));
+    setNcars(prev => prev.map(n => n.id === viewingNCARId ? { ...n, status: NCARStatus.FOR_APPROVAL, rejectionRemarks: undefined } : n));
 
     onNotify(`Action Plan for ${viewingNCARId} resubmitted successfully.`, 'success');
     handleCloseModal();
@@ -194,21 +194,21 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
     setApFormData(initialApFormData);
   };
 
-  const pendingCount = ncars.filter(n => n.status === NCARStatus.ACTION_PLAN_SUBMITTED).length;
+  const pendingCount = ncars.filter(n => n.status === NCARStatus.FOR_APPROVAL).length;
 
   return (
-    <div className="space-y-10 text-base relative">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="space-y-5 text-base relative">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h3 className="text-4xl font-black text-gray-900 tracking-tight">Validation</h3>
+          <h3 className="text-2xl font-black text-gray-900 tracking-tight">Validation</h3>
         </div>
-        <div className="bg-blue-50 px-8 py-4 rounded-2xl border border-blue-100 flex items-center gap-4">
-          <div className="w-4 h-4 bg-[#3b82f6] rounded-full animate-pulse"></div>
-          <span className="text-base font-black text-blue-700 uppercase tracking-widest">{pendingCount} Review(s) Requested</span>
+        <div className="bg-blue-50 px-5 py-3 rounded-xl border border-blue-100 flex items-center gap-3">
+          <div className="w-3 h-3 bg-[#3b82f6] rounded-full animate-pulse"></div>
+          <span className="text-sm font-black text-blue-700 uppercase tracking-wide">{pendingCount} Review(s) Requested</span>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6">
+      <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input 
@@ -216,16 +216,16 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
             placeholder="Search by NCAR ID..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-base font-medium"
+            className="w-full pl-12 pr-6 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-medium"
           />
         </div>
         <div className="flex gap-3 relative" ref={filterRef}>
-          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-3 px-7 py-4 rounded-2xl text-base font-black transition-all border-2 ${typeFilters.length > 0 || showFilters ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-gray-50 border-transparent text-gray-600 hover:bg-gray-100'}`}>
+          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-black transition-all border-2 ${typeFilters.length > 0 || showFilters ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-gray-50 border-transparent text-gray-600 hover:bg-gray-100'}`}>
             <Filter size={20} /> Filters
           </button>
           {showFilters && (
             <div className="absolute top-full right-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl p-4 z-40">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3">Finding Types</span>
+              <span className="text-sm font-black text-gray-400 uppercase tracking-widest block mb-3">Finding Types</span>
               {['Major', 'Minor', 'OFI'].map(type => (
                 <label key={type} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <span className="text-sm font-bold text-gray-700">{type}</span>
@@ -234,7 +234,7 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
               ))}
             </div>
           )}
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-gray-50 border-none rounded-2xl px-7 py-4 text-base font-black text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-gray-50 border-none rounded-xl px-5 py-3 text-sm font-black text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
             <option value="All">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>
@@ -243,34 +243,43 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#3b82f6] text-white">
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">NCAR ID</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Finding Type</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest">Requirement</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest text-center">Deadline</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest text-center">Status</th>
-                <th className="px-8 py-6 text-[12px] font-black uppercase tracking-widest text-center">Action</th>
+                <tr className="bg-[#3b82f6] text-white">
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">NCAR ID</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">ACP ID</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Finding Type</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest">Requirement</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest text-center">Deadline</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest text-center">Status</th>
+                <th className="px-5 py-4 text-sm font-black uppercase tracking-widest text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredItems.length === 0 ? (
-                <tr><td colSpan={6} className="px-8 py-20 text-center text-gray-400 font-black uppercase tracking-widest italic opacity-60">No items found</td></tr>
+                <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-400 font-black uppercase tracking-widest italic opacity-60">No items found</td></tr>
               ) : (
                 filteredItems.map(n => (
                   <tr key={n.id} className="hover:bg-blue-50/20 transition-all group">
-                    <td className="px-8 py-6"><span className="text-[12px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">{n.id}</span></td>
-                    <td className="px-8 py-6"><span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase border ${n.findingType === 'Major' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>{n.findingType}</span></td>
-                    <td className="px-8 py-6 font-bold text-gray-700 text-sm line-clamp-1">{n.requirement}</td>
-                    <td className="px-8 py-6 text-center">
-                      <div className="text-[12px] font-black text-gray-900">{new Date(n.deadline).toLocaleDateString()}</div>
-                      <div className="text-[9px] font-black text-blue-500 uppercase mt-1">{getDaysRemaining(n.deadline)} days left</div>
+                    {(() => {
+                      const ap = actionPlans.find(a => a.ncarId === n.id);
+                      return (
+                        <>
+                          <td className="px-5 py-4"><span className="text-sm font-black text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">{n.id}</span></td>
+                          <td className="px-5 py-4"><span className="text-sm font-black text-gray-800 bg-gray-50 px-2 py-1 rounded border border-gray-100">{ap ? ap.id : '-'}</span></td>
+                        </>
+                      );
+                    })()}
+                    <td className="px-5 py-4"><span className={`text-sm font-black px-3 py-1 rounded-full uppercase border ${n.findingType === 'Major' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>{n.findingType}</span></td>
+                    <td className="px-5 py-4 font-bold text-gray-700 text-sm line-clamp-1">{n.requirement}</td>
+                      <td className="px-5 py-4 text-center">
+                      <div className="text-sm font-black text-gray-900">{new Date(n.deadline).toLocaleDateString()}</div>
+                      <div className="text-sm font-black text-blue-500 uppercase mt-1">{getDaysRemaining(n.deadline)} days left</div>
                     </td>
-                    <td className="px-8 py-6 text-center"><span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase border ${n.status === NCARStatus.CLOSED ? 'bg-green-50 text-green-600 border-green-100' : n.status === NCARStatus.REOPENED ? 'bg-red-50 text-red-600 border-red-100' : n.status === NCARStatus.ACTION_PLAN_SUBMITTED ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>{n.status === NCARStatus.CLOSED ? 'Approved' : (n.status === NCARStatus.REOPENED ? 'Rejected' : (n.status === NCARStatus.ACTION_PLAN_SUBMITTED ? 'Review Required' : n.status))}</span></td>
-                    <td className="px-8 py-6 text-center"><button onClick={() => setViewingNCARId(n.id)} className={`p-3 rounded-2xl transition-all border ${isAuditee && (n.status === NCARStatus.REOPENED || n.status === NCARStatus.REJECTED) ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100' : 'text-blue-600 bg-blue-50 border-blue-100 hover:bg-blue-600 hover:text-white'}`}>{isAuditee && (n.status === NCARStatus.REOPENED || n.status === NCARStatus.REJECTED) ? <RefreshCcw size={20} /> : <Eye size={20} />}</button></td>
+                    <td className="px-5 py-4 text-center"><span className={`text-sm font-black px-3 py-1 rounded-full uppercase border ${n.status === NCARStatus.CLOSED ? 'bg-green-50 text-green-600 border-green-100' : n.status === NCARStatus.REOPENED ? 'bg-red-50 text-red-600 border-red-100' : n.status === NCARStatus.FOR_APPROVAL ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>{n.status === NCARStatus.CLOSED ? 'Approved' : (n.status === NCARStatus.REOPENED ? 'Rejected' : (n.status === NCARStatus.FOR_APPROVAL ? 'Review Required' : n.status))}</span></td>
+                    <td className="px-5 py-4 text-center"><button onClick={() => setViewingNCARId(n.id)} className={`p-3 rounded-2xl transition-all border ${isAuditee && (n.status === NCARStatus.REOPENED || n.status === NCARStatus.REJECTED) ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100' : 'text-blue-600 bg-blue-50 border-blue-100 hover:bg-blue-600 hover:text-white'}`}>{isAuditee && (n.status === NCARStatus.REOPENED || n.status === NCARStatus.REJECTED) ? <RefreshCcw size={20} /> : <Eye size={20} />}</button></td>
                   </tr>
                 ))
               )}
@@ -281,16 +290,17 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
 
       {viewingNCARId && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6 overflow-y-auto">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-5xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-7xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {(() => {
               const n = ncars.find(nc => nc.id === viewingNCARId);
               if (!n) return null;
+              const ap = actionPlans.find(a => a.ncarId === viewingNCARId);
               
               return (
                 <>
-                  <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <div className="flex items-center gap-5">
-                      <div className={`p-4 rounded-3xl text-white shadow-xl ${isCreatingActionPlan ? 'bg-[#3b82f6]' : (n.status === NCARStatus.REOPENED ? 'bg-red-600' : 'bg-[#3b82f6]')}`}>
+                      <div className={`p-4 rounded-2xl text-white shadow-xl ${isCreatingActionPlan ? 'bg-[#3b82f6]' : (n.status === NCARStatus.REOPENED ? 'bg-red-600' : 'bg-[#3b82f6]')}`}>
                         {isCreatingActionPlan ? <RefreshCcw size={32} /> : <ShieldCheck size={32} />}
                       </div>
                       <div>
@@ -303,38 +313,51 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
 
                   {!isCreatingActionPlan ? (
                     <>
-                      <div className="p-10 grid grid-cols-1 lg:grid-cols-2 gap-12 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                        <div className="space-y-8">
+                      <div className="p-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div className="space-y-5">
                           {n.rejectionRemarks && (
-                            <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-6 flex items-start gap-5 shadow-sm">
+                              <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-6 flex items-start gap-5 shadow-sm">
                               <AlertTriangle className="text-red-600 mt-1 flex-shrink-0" size={24} />
                               <div>
-                                <span className="text-[10px] font-black text-red-600 uppercase tracking-widest block mb-1">Feedback from Lead Auditor</span>
+                                <span className="text-sm font-black text-red-600 uppercase tracking-widest block mb-1">Feedback from Lead Auditor</span>
                                 <p className="text-base font-bold text-red-900 italic">"{n.rejectionRemarks}"</p>
                               </div>
                             </div>
                           )}
-                          <div className="flex items-center gap-3 text-blue-600 font-black uppercase text-xs border-b-2 border-blue-100 pb-3"><ClipboardList size={18} /> Finding Analysis</div>
+                          <div className="flex items-center gap-3 text-blue-600 font-black uppercase text-xs border-b-2 border-blue-100 pb-3"><ClipboardList size={18} /> Audit Finding</div>
                           <div className="space-y-6">
-                            <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Statement</label><div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 text-base text-gray-700 italic">"{n.statement}"</div></div>
-                            <div className="grid grid-cols-2 gap-6">
-                              <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Finding Type</label><span className="text-sm font-black text-gray-900 uppercase bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.findingType}</span></div>
-                              <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Requirement</label><span className="text-sm font-black text-gray-900 uppercase bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.requirement}</span></div>
+                            <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Statement</label><div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-base text-gray-700 italic">"{n.statement}"</div></div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Finding Type</label><span className="text-sm font-black text-gray-900 uppercase bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.findingType}</span></div>
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Requirement</label><span className="text-sm font-black text-gray-900 uppercase bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.requirement}</span></div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Process</label><span className="text-sm font-black text-gray-900 bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.processName || 'N/A'}</span></div>
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Audit Type</label><span className="text-sm font-black text-gray-900 bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.auditType || 'N/A'}</span></div>
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Area</label><span className="text-sm font-black text-gray-900 bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.area || 'N/A'}</span></div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Auditor</label><span className="text-sm font-black text-gray-900 bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.auditor || 'N/A'}</span></div>
+                              <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Standard Clause</label><span className="text-sm font-black text-gray-900 bg-white border-2 border-gray-100 px-4 py-2 rounded-xl block">{n.standardClause || 'N/A'}</span></div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="space-y-8">
-                          <div className="flex items-center gap-3 text-green-600 font-black uppercase text-xs border-b-2 border-green-100 pb-3"><CheckCircle2 size={18} /> Plan Analysis</div>
+                        <div className="space-y-5">
+                          <div className="flex items-center gap-3 text-green-600 font-black uppercase text-xs border-b-2 border-green-100 pb-3"><CheckCircle2 size={18} /> Action Plan</div>
                           <div className="space-y-6">
-                            {actionPlans.find(ap => ap.ncarId === viewingNCARId) ? (
+                            {ap ? (
                               <>
-                                <div><label className="text-[10px] font-black text-gray-400 block mb-2">Root Cause</label><div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 text-sm font-bold text-gray-800">{apFormData.rootCause || 'N/A'}</div></div>
-                                <div><label className="text-[10px] font-black text-gray-400 block mb-2">Corrective Strategy</label><div className="bg-green-50/30 p-6 rounded-3xl border border-green-100 text-base text-gray-900 font-black">{apFormData.actionPlan || 'N/A'}</div></div>
+                                <div><label className="text-sm font-black text-gray-400 block mb-2">ACP Number</label><div className="bg-white p-4 rounded-2xl border border-gray-100 text-sm font-black text-gray-800">{ap.id}</div></div>
+                                <div><label className="text-sm font-black text-gray-400 block mb-2">Root Cause</label><div className={`bg-blue-50/50 p-6 rounded-2xl border border-blue-100 text-sm font-bold text-gray-800 ${isLead ? '' : 'line-clamp-6'}`}>{apFormData.rootCause || 'N/A'}</div></div>
+                                <div><label className="text-sm font-black text-gray-400 block mb-2">Corrective Strategy</label><div className={`bg-green-50/30 p-6 rounded-2xl border border-green-100 text-base text-gray-900 font-black ${isLead ? '' : 'line-clamp-6'}`}>{apFormData.actionPlan || 'N/A'}</div></div>
                                 <div className="flex items-center gap-4 pt-4">
                                   <div className="flex-1 bg-gray-50 p-4 rounded-2xl border border-gray-100"><label className="text-[8px] font-black text-gray-400 uppercase block mb-1">Auditee</label><div className="flex items-center gap-2 text-xs font-black text-gray-800"><User size={14} className="text-blue-500" /> {apFormData.responsible}</div></div>
                                   <div className="flex-1 bg-gray-50 p-4 rounded-2xl border border-gray-100"><label className="text-[8px] font-black text-gray-400 uppercase block mb-1">Date</label><div className="flex items-center gap-2 text-xs font-black text-gray-800"><Calendar size={14} className="text-blue-500" /> {apFormData.dueDate}</div></div>
                                 </div>
+                                {ap.remarks && (
+                                  <div className="mt-4"><label className="text-sm font-black text-gray-400 block mb-2">Action Plan Attachment</label><div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-sm font-bold text-gray-800"><FileIcon className="inline-block mr-2" /> <a href={`/${ap.remarks}`} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{ap.remarks}</a></div></div>
+                                )}
                               </>
                             ) : (
                               <div className="flex flex-col items-center justify-center h-full py-20 text-center bg-gray-50 rounded-[2rem] border border-dashed border-gray-200"><Clock size={48} className="text-gray-300 mb-4" /><p className="text-gray-400 font-black uppercase text-xs tracking-widest">Awaiting Plan</p></div>
@@ -343,11 +366,11 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
                         </div>
                       </div>
 
-                      <div className="p-8 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                      <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <div className="text-xs font-bold text-gray-400">Audit Ref: <span className="text-blue-500 font-black">{n.auditPlanId}</span></div>
                         <div className="flex gap-4">
-                          {isLead && n.status === NCARStatus.ACTION_PLAN_SUBMITTED && (
-                            <><button onClick={() => setShowRejectModal(true)} className="flex items-center gap-2 px-10 py-4 bg-white border-2 border-red-100 text-red-600 rounded-2xl font-black hover:bg-red-50 transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-50"><XCircle size={18} /> Request Revision</button><button onClick={() => handleApprove(n.id)} className="flex items-center gap-2 px-12 py-4 bg-[#3b82f6] text-white rounded-2xl font-black hover:bg-blue-700 shadow-2xl uppercase text-xs tracking-widest"><CheckCircle2 size={18} /> Final Closure</button></>
+                          {isLead && n.status === NCARStatus.FOR_APPROVAL && (
+                            <><button onClick={() => setShowRejectModal(true)} className="flex items-center gap-2 px-10 py-4 bg-white border-2 border-red-100 text-red-600 rounded-2xl font-black hover:bg-red-50 transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-50"><XCircle size={18} />Reject</button><button onClick={() => handleApprove(n.id)} className="flex items-center gap-2 px-12 py-4 bg-[#3b82f6] text-white rounded-2xl font-black hover:bg-blue-700 shadow-2xl uppercase text-xs tracking-widest"><CheckCircle2 size={18} />Approve</button></>
                           )}
                           {isAuditee && (n.status === NCARStatus.REOPENED || n.status === NCARStatus.REJECTED) && (
                             <div className="flex gap-4">
@@ -360,28 +383,28 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
                     </>
                   ) : (
                     <form onSubmit={handleAuditeeSubmit}>
-                      <div className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                      <div className="p-10 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
                          <div className="bg-blue-50/50 border border-blue-100 rounded-[2rem] p-6 flex items-start gap-4">
                             <div className="p-2 bg-blue-100 text-blue-600 rounded-xl"><AlertCircle size={20} /></div>
-                            <div><span className="text-[10px] font-black text-blue-400 uppercase block mb-1">NCAR Finding Statement</span><p className="text-sm font-bold text-gray-800 italic leading-relaxed">"{n.statement}"</p></div>
+                            <div><span className="text-sm font-black text-blue-400 uppercase block mb-1">NCAR Finding Statement</span><p className="text-sm font-bold text-gray-800 italic leading-relaxed">"{n.statement}"</p></div>
                          </div>
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-6">
-                                <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Immediate Correction (Containment)</label><textarea required value={apFormData.correction} onChange={(e) => setApFormData({...apFormData, correction: e.target.value})} placeholder="Steps taken immediately..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[100px]" /></div>
-                                <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Root Cause Analysis (RCA)</label><textarea required value={apFormData.rootCause} onChange={(e) => setApFormData({...apFormData, rootCause: e.target.value})} placeholder="Systemic failures identified..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[140px]" /></div>
+                                <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Immediate Correction (Containment)</label><textarea required value={apFormData.correction} onChange={(e) => setApFormData({...apFormData, correction: e.target.value})} placeholder="Steps taken immediately..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[100px]" /></div>
+                                <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Root Cause Analysis (RCA)</label><textarea required value={apFormData.rootCause} onChange={(e) => setApFormData({...apFormData, rootCause: e.target.value})} placeholder="Systemic failures identified..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[140px]" /></div>
                             </div>
                             <div className="space-y-6">
-                                <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Long-term Corrective Action</label><textarea required value={apFormData.actionPlan} onChange={(e) => setApFormData({...apFormData, actionPlan: e.target.value})} placeholder="Strategy to prevent recurrence..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[100px]" /></div>
+                                <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Long-term Corrective Action</label><textarea required value={apFormData.actionPlan} onChange={(e) => setApFormData({...apFormData, actionPlan: e.target.value})} placeholder="Strategy to prevent recurrence..." className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[100px]" /></div>
                                 <div className="grid grid-cols-2 gap-4">
-                                  <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Assignee</label><input required type="text" value={apFormData.responsible} onChange={(e) => setApFormData({...apFormData, responsible: e.target.value})} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-sm font-bold" /></div>
-                                  <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Target Date</label><input required type="date" value={apFormData.dueDate} onChange={(e) => setApFormData({...apFormData, dueDate: e.target.value})} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-sm font-bold" /></div>
+                                  <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Assignee</label><input required type="text" value={apFormData.responsible} onChange={(e) => setApFormData({...apFormData, responsible: e.target.value})} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-sm font-bold" /></div>
+                                  <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Target Date</label><input required type="date" value={apFormData.dueDate} onChange={(e) => setApFormData({...apFormData, dueDate: e.target.value})} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-sm font-bold" /></div>
                                 </div>
-                                <div><label className="text-[10px] font-black text-gray-400 uppercase block mb-2">Evidence Artifacts</label><input type="file" id="revision-file-val" className="hidden" onChange={(e) => e.target.files && setApFormData({...apFormData, attachmentName: e.target.files[0].name})} /><label htmlFor="revision-file-val" className="w-full border-2 border-dashed border-blue-200 rounded-2xl p-6 bg-blue-50/30 flex items-center justify-center gap-4 cursor-pointer hover:bg-blue-100/30 transition-all shadow-sm"><FileUp size={24} className="text-blue-500" /><div className="text-left"><p className="text-[10px] font-black text-blue-900 uppercase truncate">{apFormData.attachmentName || 'Upload evidence artifacts'}</p><p className="text-[8px] text-blue-400 font-bold uppercase tracking-widest mt-1">Proof of Implementation</p></div></label></div>
+                                <div><label className="text-sm font-black text-gray-400 uppercase block mb-2">Evidence Artifacts</label><input type="file" id="revision-file-val" className="hidden" onChange={(e) => e.target.files && setApFormData({...apFormData, attachmentName: e.target.files[0].name})} /><label htmlFor="revision-file-val" className="w-full border-2 border-dashed border-blue-200 rounded-2xl p-6 bg-blue-50/30 flex items-center justify-center gap-4 cursor-pointer hover:bg-blue-100/30 transition-all shadow-sm"><FileUp size={24} className="text-blue-500" /><div className="text-left"><p className="text-sm font-black text-blue-900 uppercase truncate">{apFormData.attachmentName || 'Upload evidence artifacts'}</p><p className="text-[8px] text-blue-400 font-bold uppercase tracking-widest mt-1">Proof of Implementation</p></div></label></div>
                             </div>
                          </div>
                       </div>
 
-                      <div className="p-8 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                      <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <button type="button" onClick={() => setApFormData(initialApFormData)} className="flex items-center gap-2 px-6 py-4 bg-white border-2 border-gray-100 text-gray-400 hover:text-red-600 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"><Eraser size={18} /> Reset Form</button>
                         <div className="flex gap-4">
                           <button type="button" onClick={() => setIsCreatingActionPlan(false)} className="flex items-center gap-3 px-8 py-4 bg-white border-2 border-gray-100 text-gray-600 rounded-2xl font-black hover:bg-gray-50 transition-all uppercase text-[10px] tracking-widest shadow-sm"><Undo2 size={18} /> Back</button>
@@ -397,17 +420,38 @@ const ValidationModule: React.FC<ValidationModuleProps> = ({ ncars, actionPlans,
         </div>
       )}
 
-      {showRejectModal && (
-        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-6 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden border border-red-50">
-            <div className="p-8 space-y-8">
-              <div className="flex items-center gap-5"><div className="p-4 bg-red-50 rounded-3xl text-red-600"><AlertTriangle size={36} /></div><div><h4 className="text-2xl font-black text-gray-900 tracking-tight uppercase">Rejection Log</h4><p className="text-[10px] font-black text-gray-400 tracking-widest mt-1">Ref: {viewingNCARId}</p></div></div>
-              <div className="space-y-3"><label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2"><MessageSquare size={14} className="text-red-500" /> Rejection Reason (Required)</label><textarea autoFocus required value={rejectionRemarks} onChange={(e) => setRejectionRemarks(e.target.value)} placeholder="Clearly explain the shortcomings..." className="w-full bg-red-50/10 border-2 border-red-50 rounded-2xl p-6 text-sm font-bold text-gray-700 outline-none focus:ring-4 focus:ring-red-100 transition-all min-h-[160px] resize-none" /></div>
-              <div className="flex gap-4"><button onClick={() => { setShowRejectModal(false); setRejectionRemarks(''); }} className="flex-1 px-6 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black text-xs uppercase hover:bg-gray-100 transition-all text-sm uppercase tracking-widest">Cancel</button><button onClick={finalizeRejection} disabled={!rejectionRemarks.trim()} className="flex-[1.5] px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-xs hover:bg-red-700 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3 text-sm uppercase tracking-widest"><AlertCircle size={18} /> Confirm Rejection</button></div>
+      {showRejectModal && viewingNCARId && (() => {
+        const n = ncars.find(nc => nc.id === viewingNCARId);
+        const ap = actionPlans.find(a => a.ncarId === viewingNCARId);
+        return (
+          <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-6 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden border border-red-50">
+              <div className="p-6 space-y-6">
+                <div className="flex items-center gap-5"><div className="p-4 bg-red-50 rounded-2xl text-red-600"><AlertTriangle size={36} /></div><div><h4 className="text-2xl font-black text-gray-900 tracking-tight uppercase">Rejection Log</h4><p className="text-sm font-black text-gray-400 tracking-widest mt-1">Ref: {viewingNCARId}</p></div></div>
+
+                {ap ? (
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-sm font-black text-gray-400 block mb-1">ACP Number</label><div className="text-sm font-black text-gray-800">{ap.id}</div></div>
+                      <div><label className="text-sm font-black text-gray-400 block mb-1">Auditee</label><div className="text-sm font-black text-gray-800">{ap.responsiblePerson}</div></div>
+                    </div>
+                    <div className="mt-4"><label className="text-sm font-black text-gray-400 block mb-1">Root Cause</label><div className="text-sm font-bold text-gray-800">{ap.rootCause || 'N/A'}</div></div>
+                    <div className="mt-4"><label className="text-sm font-black text-gray-400 block mb-1">Corrective Strategy</label><div className="text-sm font-bold text-gray-800">{ap.correctiveAction || 'N/A'}</div></div>
+                    {ap.remarks && (
+                      <div className="mt-4"><label className="text-sm font-black text-gray-400 block mb-1">Action Plan Attachment</label><div className="bg-white p-3 rounded-xl border border-gray-100 text-sm font-bold text-gray-800"><FileIcon className="inline-block mr-2" /> <a href={`/${ap.remarks}`} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{ap.remarks}</a></div></div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-dashed border-gray-200 text-center text-gray-400">No Action Plan found for this NCAR.</div>
+                )}
+
+                <div className="space-y-3"><label className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2"><MessageSquare size={14} className="text-red-500" /> Rejection Reason (Required)</label><textarea autoFocus required value={rejectionRemarks} onChange={(e) => setRejectionRemarks(e.target.value)} placeholder="Clearly explain the shortcomings..." className="w-full bg-red-50/10 border-2 border-red-50 rounded-2xl p-6 text-sm font-bold text-gray-700 outline-none focus:ring-4 focus:ring-red-100 transition-all min-h-[160px] resize-none" /></div>
+                <div className="flex gap-4"><button onClick={() => { setShowRejectModal(false); setRejectionRemarks(''); }} className="flex-1 px-6 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black text-sm uppercase hover:bg-gray-100 transition-all tracking-widest">Cancel</button><button onClick={finalizeRejection} disabled={!rejectionRemarks.trim()} className="flex-[1.5] px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-sm hover:bg-red-700 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest"><AlertCircle size={18} /> Reject</button></div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

@@ -13,7 +13,8 @@ export enum AuditStatus {
 }
 
 export enum NCARStatus {
-  OPEN = 'Open',
+  PENDING = 'Pending',
+  FOR_APPROVAL = 'For Approval',
   ACTION_PLAN_SUBMITTED = 'Action Plan Submitted',
   REJECTED = 'Rejected',
   VALIDATED = 'Validated',
